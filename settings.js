@@ -122,7 +122,7 @@ function renderSomersloop(settings) {
 
 // title
 
-export const DEFAULT_TITLE = "Satisfactory Calculator"
+export const DEFAULT_TITLE = "Little Rocket Lab Calculator"
 
 export function setTitle(s) {
     if (s === "") {
@@ -496,8 +496,8 @@ function renderDebugCheckbox(settings) {
 export function renderSettings(settings) {
     renderTitle(settings)
     renderIgnore(settings)
-    renderOverclock(settings)
-    renderSomersloop(settings)
+    //renderOverclock(settings)
+    //renderSomersloop(settings)
     renderRateOptions(settings)
     renderPrecisions(settings)
     renderValueFormat(settings)

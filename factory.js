@@ -25,18 +25,16 @@ import { renderTotals } from "./visualize.js"
 
 const DEFAULT_ITEM_KEY = "supercomputer"
 
-let minerCategories = new Set(["mineral", "oil"])
+let minerCategories = new Set(["mineral", "fluid", "boat-item"])
 
 export let resourcePurities = [
-    {key: "0", name: "Impure", factor: half},
     {key: "1", name: "Normal", factor: one},
-    {key: "2", name: "Pure", factor: Rational.from_float(2)},
 ]
 
-export let DEFAULT_PURITY = resourcePurities[1]
+export let DEFAULT_PURITY = resourcePurities[0]
 
-export let DEFAULT_BELT = "belt1"
-export let DEFAULT_PIPE = "pipe1"
+export let DEFAULT_BELT = "conveyor-belt"
+export let DEFAULT_PIPE = "pipe"
 
 const OVERCLOCK_POWER_EXPONENT = Math.log2(2.5)
 

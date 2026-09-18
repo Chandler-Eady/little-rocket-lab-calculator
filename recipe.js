@@ -151,16 +151,22 @@ export class DisabledRecipe {
 }
 
 function makeRecipe(data, items, d) {
-    let time = Rational.from_float(d.time)
+	let time;
+	if(d.denominator) {
+		time = new Rational(bigInt(d.time), bigInt(d.denominator))
+	}
+	else {time = Rational.from_float(d.time)}
     let products = []
-    for (let [item_key, amount] of d.products) {
+    for (let [item_key, amount, denominator] of d.products) {
         let item = items.get(item_key)
-        products.push(new Ingredient(item, Rational.from_float(amount)))
+		let ratio = denominator ? new Rational(bigInt(amount), bigInt(denominator)) : Rational.from_float(amount);
+        products.push(new Ingredient(item, ratio))
     }
     let ingredients = []
-    for (let [item_key, amount] of d.ingredients) {
+    for (let [item_key, amount, denominator] of d.ingredients) {
         let item = items.get(item_key)
-        ingredients.push(new Ingredient(item, Rational.from_float(amount)))
+		let ratio = denominator ? new Rational(bigInt(amount), bigInt(denominator)) : Rational.from_float(amount);
+        ingredients.push(new Ingredient(item, ratio))
     }
     return new Recipe(d.key_name, d.name, d.category, time, ingredients, products)
 }
