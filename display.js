@@ -25,34 +25,6 @@ class Header {
     }
 }
 
-function changeOverclock(event, d) {
-    let hundred = Rational.from_float(100)
-    let twoFifty = Rational.from_float(250)
-    let x = Rational.from_string(this.value).floor()
-    if (x.less(one)) {
-        x = one
-    }
-    if (twoFifty.less(x)) {
-        x = twoFifty
-    }
-    x = x.div(hundred)
-    spec.setOverclock(d.recipe, x)
-    spec.display()
-}
-
-function clickSloop(event, d) {
-    event.preventDefault()
-    let count = d.sloop
-    let max = d.building.maxSomersloop
-    if (count.equal(zero)) {
-        count = max
-    } else {
-        count = count.sub(one)
-    }
-    spec.setSomersloop(d.recipe, count)
-    spec.updateSolution()
-}
-
 function setlen(a, len, callback) {
     if (a.length > len) {
         a.length = len
@@ -160,17 +132,8 @@ class DisplayGroup {
             let item = items[i] || null
             let recipe = recipes[i] || null
             let building = null
-            let overclock = null
-            let sloop = null
             if (recipe !== null) {
                 building = spec.getBuilding(recipe)
-                overclock = spec.getOverclock(recipe).mul(hundred).toString()
-                if (building !== null && building.maxSomersloop !== null) {
-                    sloop = spec.somersloop.get(recipe)
-                    if (sloop === undefined) {
-                        sloop = zero
-                    }
-                }
             }
             let single = item !== null && recipe !== null && item.name === recipe.name
             let breakdown = null
@@ -181,8 +144,6 @@ class DisplayGroup {
                 item,
                 recipe,
                 building,
-                overclock,
-                sloop,
                 single,
                 breakdown,
             })
@@ -230,8 +191,6 @@ export function displayItems(spec, totals) {
         new Header("surplus/" + spec.format.rateName, 1, true),
         new Header("belts", 2),
         new Header("buildings", 2),
-        new Header("overclock", 1),
-        new Header("somersloop", 1),
         new Header("power", 1),
         new Header("", 1),  // pop-out links
     ]
@@ -304,42 +263,13 @@ export function displayItems(spec, totals) {
                 .append("tt")
                     .classed("building-count", true)
 
-            // cell 9: overclock
-            let overclockCell = row.append("td")
-                .classed("pad building", true)
-            overclockCell.append("input")
-                .classed("overclock", true)
-                .attr("type", "number")
-                .attr("title", "")
-                .attr("min", 1)
-                .attr("max", 250)
-                .on("input", changeOverclock)
-            overclockCell.append("span")
-                .text("%")
-
-            // cell 10: somersloop
-            let sloopCell = row.append("td")
-                .classed("pad building sloopcell", true)
-                .append("div")
-                    .classed("sloop", true)
-            sloopCell.append("img")
-                .attr("src", "images/Somersloop.png")
-                .attr("width", 32)
-                .attr("height", 32)
-            sloopCell.append("div")
-                .classed("meter", true)
-            sloopCell.append("div")
-                .classed("count", true)
-            sloopCell.append("div")
-                .classed("sloopclick", true)
-                .on("click", clickSloop)
-
-            // cell 11: power
+            // cell 9: power
             row.append("td")
                 .classed("right-align pad building", true)
                 .append("tt")
                     .classed("power", true)
 
+			//cell 10: pop-out link
             row.append("td")
                 .classed("popout pad item", true)
                 .append("a")
@@ -391,7 +321,6 @@ export function displayItems(spec, totals) {
     pipeRow.selectAll("tt.belt-count")
         .text(d => spec.format.alignCount(spec.getPipeCount(totals.items.get(d.item))))
     let buildingRow = row.filter(d => d.building !== null)
-        .classed("nosloop", d => d.sloop === null)
     let buildingCell = buildingRow.selectAll("td.building-icon")
     buildingCell.selectAll("*").remove()
     let buildingExtra = buildingCell.filter(d => !d.single)
@@ -403,16 +332,7 @@ export function displayItems(spec, totals) {
         .text(" \u00d7")
     buildingRow.selectAll("tt.building-count")
         .text(d => spec.format.alignCount(spec.getCount(d.recipe, totals.rates.get(d.recipe))))
-    buildingRow.selectAll("input.overclock")
-        .attr("value", d => d.overclock)
     let hundred = Rational.from_float(100)
-    let sloopRow = buildingRow.filter(d => d.sloop !== null)
-    sloopRow.selectAll(".meter")
-        .style("height", d => {
-            return one.sub(d.sloop.div(d.building.maxSomersloop)).mul(hundred).floor().toString() + "%"
-        })
-    sloopRow.selectAll(".count")
-        .text(d => `${d.sloop.toString()}/${d.building.maxSomersloop.toString()}`)
     let totalAveragePower = zero
     let totalPeakPower = zero
     buildingRow.selectAll("tt.power")
